@@ -2,8 +2,6 @@ services:
 
   flask:
     build: .
-    container_name: flask-app
-
     ports:
       - "80:5000"
 
@@ -18,8 +16,6 @@ services:
 
   mysql:
     image: mysql:8.0
-    container_name: mysql-db
-
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
