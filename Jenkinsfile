@@ -1,6 +1,18 @@
 pipeline {
     agent any
 
+    environment {
+        APP_PORT = '80'
+        DB_HOST = 'mysql'
+        DB_USER = 'appuser'
+        DB_PASSWORD = 'apppassword'
+        DB_NAME = 'appdb'
+        MYSQL_ROOT_PASSWORD = 'rootpassword'
+        MYSQL_DATABASE = 'appdb'
+        MYSQL_USER = 'appuser'
+        MYSQL_PASSWORD = 'apppassword'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -31,7 +43,7 @@ pipeline {
         stage('Health Check') {
             steps {
                 sh 'sleep 10'
-                sh 'curl -f http://localhost/health'
+                sh "curl -f http://localhost:${APP_PORT}/health"
             }
         }
     }
