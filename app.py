@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "return "Two-Tier Flask Application v2 - CI/CD Working!""
+    return "Two-Tier Flask Application v2 - CI/CD Working!"
 
 
 @app.route("/health")
