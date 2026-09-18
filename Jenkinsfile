@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        COMPOSE_PROJECT_NAME = 'two-tier-flask'
         APP_PORT = '80'
         DB_HOST = 'mysql'
         DB_USER = 'appuser'
@@ -29,7 +30,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'docker compose down --rmi all --remove-orphans'
+                sh 'docker compose down --remove-orphans'
                 sh 'docker compose up -d'
             }
         }

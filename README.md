@@ -18,11 +18,11 @@ A two-tier web application (Flask + MySQL) containerized with Docker and Docker 
                        │
              ┌─────────┴─────────┐
              ▼                   ▼
-      ┌─────────────┐     ┌─────────────┐
-      │ Flask       │────►│ MySQL       │
-      │ Container   │     │ Container   │
-      │ Port 5002   │     │ Port 3306   │
-      └──────┬──────┘     └──────┬──────┘
+     ┌─────────────┐     ┌─────────────┐
+     │ Flask       │────►│ MySQL       │
+     │ Container   │     │ Container   │
+     │ Port 5000   │     │ Port 3306   │
+     └──────┬──────┘     └──────┬──────┘
              │                   │
            EC2 :80          Docker Volume
              │
@@ -44,12 +44,12 @@ A two-tier web application (Flask + MySQL) containerized with Docker and Docker 
 ```
 ┌─────────────────┐        ┌─────────────────┐
 │   flask-app      │ ---->  │   mysql-db       │
-│  (Flask, :5002)  │        │  (MySQL 8.0)     │
+│  (Flask, :5000)  │        │  (MySQL 8.0)     │
 │  exposed on :80  │        │  volume-backed   │
 └─────────────────┘        └─────────────────┘
 ```
 
-- **flask** service: Python 3.12 Flask app, built from the local [Dockerfile](Dockerfile), exposed on host port `80`.
+- **flask** service: Python 3.12 Flask app, built from the local [Dockerfile](Dockerfile), exposed on host port `80` by default.
 - **mysql** service: MySQL 8.0 official image, data persisted in the `mysql_data` named volume.
 
 ## Project Structure
@@ -85,6 +85,7 @@ Configured in [docker-compose.yml](docker-compose.yml) for the `flask` service:
 
 | Variable      | Description             | Default       |
 |---------------|--------------------------|---------------|
+| `APP_PORT`    | EC2/host port published for Flask | `80`          |
 | `DB_HOST`     | MySQL host/service name  | `mysql`       |
 | `DB_USER`     | MySQL username           | `appuser`     |
 | `DB_PASSWORD` | MySQL password           | `apppassword` |
@@ -160,6 +161,7 @@ docker compose down -v
 - **`Host '...' is not allowed to connect to this MySQL server`**: Usually caused by a stale `mysql_data` volume from a previous run where `MYSQL_USER` env vars weren't applied. Reset with `docker compose down -v && docker compose up -d --build`.
 - **`Access denied for user 'root'@'localhost'`**: The root password in the volume doesn't match `MYSQL_ROOT_PASSWORD`. Reset the volume as above, or recover via `--skip-grant-tables` if data must be preserved.
 - **Connection refused from `flask` to `mysql`**: Ensure both services are on the same Docker Compose network (default behavior) and `DB_HOST` matches the `mysql` service name.
+- **`Bind for 0.0.0.0:80 failed: port is already allocated`**: Jenkins sets `COMPOSE_PROJECT_NAME=two-tier-flask` so it replaces the same Compose stack each run. If port `80` is still held by an unrelated service, stop that service or change `APP_PORT`.
 
 ## Project Roadmap
 
