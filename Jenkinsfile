@@ -30,8 +30,18 @@ pipeline {
 
         stage('Health Check') {
             steps {
-                sh 'sleep 10'
-                sh 'curl -f http://localhost/health'
+                sh '''
+                    for i in $(seq 1 15); do
+                        if curl -f http://localhost/health; then
+                            exit 0
+                        fi
+                        echo "Waiting for app to be ready... ($i/15)"
+                        sleep 5
+                    done
+                    echo "Health check failed, dumping logs:"
+                    docker compose logs
+                    exit 1
+                '''
             }
         }
     }
