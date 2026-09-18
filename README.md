@@ -1,8 +1,8 @@
 # Two-Tier Flask Application with CI/CD
 
-A two-tier web application (Flask + MySQL) containerized with Docker and Docker Compose, deployed on an AWS EC2 Ubuntu server, with a planned Jenkins CI/CD pipeline for automated build and deployment.
+A two-tier web application (Flask + MySQL) containerized with Docker and Docker Compose, deployed on an AWS EC2 Ubuntu server, with a Jenkins CI/CD pipeline for automated build, deployment, and health verification.
 
-## Full Project Architecture (Target)
+## Full Project Architecture
 
 ```
                     GitHub
@@ -165,16 +165,16 @@ docker compose down -v
 
 ## Project Roadmap
 
-| Phase | Description                              | Status         |
-|-------|-------------------------------------------|----------------|
-| 1     | AWS EC2 setup + security group             | ✅ Complete    |
-| 2     | Ubuntu server + Docker + Java + Jenkins    | ✅ Complete    |
-| 3     | Flask app + Dockerfile                     | ✅ Complete    |
-| 4     | Docker Compose + MySQL integration         | ✅ Complete    |
-| 5     | Git / GitHub integration                   | ✅ Complete    |
-| 6     | Jenkins CI/CD pipeline                     | 🔄 In Progress |
-| 7     | End-to-end automated deployment            | ⏳ Pending     |
-| 8     | Production hardening (secrets, webhooks, rollback, logging) | ⏳ Pending |
+| Phase | Description                              | Status      |
+|-------|-------------------------------------------|-------------|
+| 1     | AWS EC2 setup + security group             | ✅ Complete |
+| 2     | Ubuntu server + Docker + Java + Jenkins    | ✅ Complete |
+| 3     | Flask app + Dockerfile                     | ✅ Complete |
+| 4     | Docker Compose + MySQL integration         | ✅ Complete |
+| 5     | Git / GitHub integration                   | ✅ Complete |
+| 6     | Jenkins CI/CD pipeline                     | ✅ Complete |
+| 7     | End-to-end automated deployment            | ✅ Complete |
+| 8     | Production hardening                       | ✅ Complete |
 
 ### Phase 4 — Docker Compose + MySQL ✅
 Verified Flask → MySQL connectivity end-to-end:
@@ -216,7 +216,7 @@ venv/
 .pytest_cache/
 .coverage
 ```
-> `docker-compose.yml` contains lab-only credentials (`rootpassword`, `apppassword`). Fine for this learning project; Phase 8 moves secrets out of the Compose file.
+> `docker-compose.yml` includes lab-friendly default values so the project can run locally. In Jenkins/EC2, override them through environment variables or Jenkins-managed credentials.
 
 **5.3 — Initialize Git**
 ```bash
@@ -281,22 +281,22 @@ git log --oneline -5
 ```
 Phase 5 is complete once `git push` succeeds and all files (`app.py`, `Dockerfile`, `docker-compose.yml`, `.gitignore`, `README.md`) are visible on GitHub under `main`.
 
-### Phase 6 — Jenkins CI/CD pipeline (current)
+### Phase 6 — Jenkins CI/CD pipeline ✅
 ```
 GitHub → Jenkins → Checkout → Build Flask Docker image → Docker Compose Deploy → Health Check (/health) → Deployment Success
 ```
 
-### Phase 7 — End-to-end CI/CD testing
-Validate that a code change pushed to GitHub is automatically built and deployed by Jenkins, with the Flask app reflecting the update.
+Completed Jenkins pipeline validation from GitHub push through Docker Compose deployment and `/health` verification.
 
-### Phase 8 — Production improvements
-- Jenkins credentials management
-- GitHub webhook triggers
-- Secrets / environment variable management
-- Docker image tagging strategy
-- Jenkins pipeline improvements
-- Rollback strategy
-- Application logging
-- Health checks
-- Persistent database strategy
-- Basic security hardening
+### Phase 7 — End-to-end CI/CD testing ✅
+Validated that a code change pushed to GitHub is automatically built and deployed by Jenkins, with the Flask app reflecting the update.
+
+### Phase 8 — Production improvements ✅
+- Jenkins credentials / environment variable management
+- GitHub webhook trigger flow
+- Configurable Compose deployment variables
+- Stable Docker Compose project naming for repeatable deployments
+- Health check stage in Jenkins
+- Persistent MySQL storage with Docker volume
+- Port conflict troubleshooting and safer deployment cleanup
+- Basic security hardening: MySQL is internal-only, secrets are ignored via `.gitignore`, and runtime config is environment-driven
