@@ -1,7 +1,7 @@
 services:
-
   flask:
     build: .
+    container_name: two-tier-flask-app
     ports:
       - "${APP_PORT:-80}:5000"
     environment:
@@ -10,10 +10,13 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-apppassword}
       DB_NAME: ${DB_NAME:-appdb}
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
 
   mysql:
     image: mysql:8.0
+    container_name: two-tier-flask-db
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-appdb}
@@ -21,6 +24,14 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-apppassword}
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
 
 volumes:
   mysql_data:
